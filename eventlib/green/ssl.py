@@ -1,6 +1,6 @@
 __ssl = __import__('ssl')
 for var in (var for var in dir(__ssl) if not var.startswith('__')):
-    exec "%s = __ssl.%s" % (var, var)
+    exec("%s = __ssl.%s" % (var, var))
 del var
 
 time = __import__('time')
@@ -66,7 +66,7 @@ class GreenSSLSocket(__ssl.SSLSocket):
             while True:
                 try:
                     return func(*a, **kw)
-                except SSLError, e:
+                except SSLError as e:
                     if e.args[0] == SSL_ERROR_WANT_READ:
                         trampoline(self,
                                    read=True,
@@ -172,7 +172,7 @@ class GreenSSLSocket(__ssl.SSLSocket):
                 while True:
                     try:
                         return real_connect(self, addr)
-                    except orig_socket.error, e:
+                    except orig_socket.error as e:
                         if e.args[0] in CONNECT_ERR:
                             trampoline(self, write=True)
                         elif e.args[0] in CONNECT_SUCCESS:
@@ -184,7 +184,7 @@ class GreenSSLSocket(__ssl.SSLSocket):
                 while True:
                     try:
                         real_connect(self, addr)
-                    except orig_socket.error, e:
+                    except orig_socket.error as e:
                         if e.args[0] in CONNECT_ERR:
                             trampoline(self, write=True, timeout=end-time.time(), timeout_exc=SSLError('timed out'))
                         elif e.args[0] in CONNECT_SUCCESS:
@@ -221,7 +221,7 @@ class GreenSSLSocket(__ssl.SSLSocket):
                     newsock, addr = socket.accept(self)
                     set_nonblocking(newsock)
                     break
-                except orig_socket.error, e:
+                except orig_socket.error as e:
                     if e.args[0] not in BLOCKING_ERR:
                         raise
                     trampoline(self, read=True, timeout=self.gettimeout(), timeout_exc=SSLError('timed out'))

@@ -16,14 +16,14 @@
 import os
 import threading
 
-from Queue import Empty, Queue
+from queue import Empty, Queue
 
 from eventlib import api, coros, greenio
 
 QUIET=False
 
 _rpipe, _wpipe = os.pipe()
-_rfile = os.fdopen(_rpipe,"r",0)
+_rfile = os.fdopen(_rpipe,"r")
 ## Work whether or not wrap_pipe_with_coroutine_pipe was called
 if not isinstance(_rfile, greenio.GreenPipe):
     _rfile = greenio.GreenPipe(_rfile)
@@ -31,7 +31,7 @@ if not isinstance(_rfile, greenio.GreenPipe):
 
 def _signal_t2e():
     from eventlib import util
-    nwritten = util.__original_write__(_wpipe, ' ')
+    nwritten = util.__original_write__(_wpipe, b' ')
 
 _reqq = Queue(maxsize=-1)
 _rspq = Queue(maxsize=-1)
@@ -70,7 +70,7 @@ def tworker():
             rv = meth(*args,**kwargs)
         except SYS_EXCS:
             raise
-        except Exception,exn:
+        except Exception as exn:
             import sys
             (a,b,tb) = sys.exc_info()
             rv = (exn,a,b,tb)
@@ -183,4 +183,3 @@ def killall():
         _reqq.put(None)
     for thr in _threads.values():
         thr.join()
-

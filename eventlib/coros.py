@@ -569,7 +569,7 @@ class Actor(object):
 
 
 def _test():
-    print "Running doctests.  There will be no further output if they succeed."
+    print("Running doctests.  There will be no further output if they succeed.")
     import doctest
     doctest.testmod()
 

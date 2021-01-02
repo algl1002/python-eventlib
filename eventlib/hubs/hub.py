@@ -124,7 +124,7 @@ class BaseHub(object):
         print >>sys.stderr, "Removing descriptor: %r" % (fileno,)
         try:
             self.remove_descriptor(fileno)
-        except Exception, e:
+        except Exception as e:
             print >>sys.stderr, "Exception while removing descriptor! %r" % (e,)
 
     def wait(self, seconds=None):
@@ -276,7 +276,7 @@ class BaseHub(object):
         t = self.timers
         last = bisect.bisect_right(t, (when, 1))
         i = 0
-        for i in xrange(last):
+        for i in range(last):
             timer = t[i][2]
             try:
                 try:
@@ -302,4 +302,3 @@ class BaseHub(object):
 
     def get_timers_count(hub):
         return max(len(x) for x in [hub.timers, hub.next_timers])
-

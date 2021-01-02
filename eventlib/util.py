@@ -77,7 +77,7 @@ def wrap_pipes_with_coroutine_pipes():
         from eventlib import api
         try:
             api.trampoline(fd, read=True)
-        except socket.error, e:
+        except socket.error as e:
             if e[0] == errno.EPIPE:
                 return ''
             else:
@@ -172,4 +172,3 @@ def set_reuse_addr(sock):
         )
     except socket.error:
         pass
-

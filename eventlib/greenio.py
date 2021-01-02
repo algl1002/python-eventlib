@@ -55,7 +55,7 @@ def higher_order_recv(recv_func):
                 trampoline(fd, read=True, timeout=timeout, timeout_exc=socket.timeout)
             except socket.timeout:
                 raise
-            except socket.error, e:
+            except socket.error as e:
                 if e[0] == errno.EPIPE:
                     bytes = ''
                 else:
@@ -102,7 +102,7 @@ else:
 def socket_accept(descriptor):
     try:
         return descriptor.accept()
-    except socket.error, e:
+    except socket.error as e:
         if e.args[0] in BLOCKING_ERR:
             return None
         raise
@@ -111,7 +111,7 @@ def socket_accept(descriptor):
 def socket_send(descriptor, data):
     try:
         return descriptor.send(data)
-    except socket.error, e:
+    except socket.error as e:
         if e.args[0] in BLOCKING_ERR + errno.ENOTCONN:
             return 0
         raise
@@ -121,7 +121,7 @@ SOCKET_CLOSED = (errno.ECONNRESET, errno.ENOTCONN, errno.ESHUTDOWN)
 def socket_recv(descriptor, buflen):
     try:
         return descriptor.recv(buflen)
-    except socket.error, e:
+    except socket.error as e:
         if e.args[0] in BLOCKING_ERR:
             return None
         if e.args[0] in SOCKET_CLOSED:
@@ -132,11 +132,11 @@ def socket_recv(descriptor, buflen):
 def file_recv(fd, buflen):
     try:
         return fd.read(buflen)
-    except IOError, e:
+    except IOError as e:
         if e[0] == errno.EAGAIN:
             return None
         return ''
-    except socket.error, e:
+    except socket.error as e:
         if e[0] == errno.EPIPE:
             return ''
         raise
@@ -147,12 +147,12 @@ def file_send(fd, data):
         fd.write(data)
         fd.flush()
         return len(data)
-    except IOError, e:
+    except IOError as e:
         if e[0] == errno.EAGAIN:
             return 0
-    except ValueError, e:
+    except ValueError as e:
         written = 0
-    except socket.error, e:
+    except socket.error as e:
         if e[0] == errno.EPIPE:
             written = 0
 
@@ -162,10 +162,13 @@ def set_nonblocking(fd):
         setblocking = fd.setblocking
     except AttributeError:
         # This version of Python predates socket.setblocking()
+        ### UNCOMMENT THIS ###
         import fcntl
         fileno = fd.fileno()
         flags = fcntl.fcntl(fileno, fcntl.F_GETFL)
         fcntl.fcntl(fileno, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+        ### UNCOMMENT THIS ###
+        #pass
     else:
         # socket supports setblocking()
         setblocking(0)
@@ -175,7 +178,7 @@ class GreenSocket(object):
     is_secure = False
     timeout = None
     def __init__(self, family_or_realsock=socket.AF_INET, *args, **kwargs):
-        if isinstance(family_or_realsock, (int, long)):
+        if isinstance(family_or_realsock, int):
             fd = _original_socket(family_or_realsock, *args, **kwargs)
         else:
             fd = family_or_realsock
@@ -266,7 +269,7 @@ class GreenSocket(object):
             while not socket_connect(fd, address):
                 try:
                     trampoline(fd, write=True, timeout_exc=socket.timeout)
-                except socket.error, ex:
+                except socket.error as ex:
                     return ex[0]
         else:
             end = time.time() + self.gettimeout()
@@ -277,7 +280,7 @@ class GreenSocket(object):
                     raise socket.timeout
                 try:
                     trampoline(fd, write=True, timeout=end-time.time(), timeout_exc=socket.timeout)
-                except socket.error, ex:
+                except socket.error as ex:
                     return ex[0]
 
     def dup(self, *args, **kw):
@@ -531,4 +534,3 @@ def socketpair(*args):
 
 def fromfd(*args):
     return GreenSocket(socket.fromfd(*args))
-

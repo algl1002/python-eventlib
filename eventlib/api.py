@@ -113,12 +113,12 @@ def tcp_server(listensocket, server, *args, **kw):
     \*\*kw
         The keyword arguments to pass to *server*.
     """
-    print "tcpserver spawning %s on %s" % (server, listensocket.getsockname())
+    print("tcpserver spawning %s on %s" % (server, listensocket.getsockname()))
     try:
         try:
             while True:
                 spawn(server, listensocket.accept(), *args, **kw)
-        except socket.error, e:
+        except socket.error as e:
             # Broken pipe means it was shutdown
             if e[0] != 32:
                 raise
@@ -395,7 +395,7 @@ def with_timeout(seconds, func, *args, **kwds):
     try:
         try:
             return func(*args, **kwds)
-        except TimeoutError, ex:
+        except TimeoutError as ex:
             if ex is error and has_timeout_value:
                 return timeout_value
             raise
@@ -529,7 +529,7 @@ class Spew(object):
                     line = 'Unknown code named [%s].  VM instruction #%d' % (
                         frame.f_code.co_name, frame.f_lasti)
             if self.trace_names is None or name in self.trace_names:
-                print '%s:%s: %s' % (name, lineno, line.rstrip())
+                print('%s:%s: %s' % (name, lineno, line.rstrip()))
                 if not self.show_values:
                     return self
                 details = '\t'
@@ -541,7 +541,7 @@ class Spew(object):
                     if tok in frame.f_locals:
                         details += '%s=%r ' % (tok, frame.f_locals[tok])
                 if details.strip():
-                    print details
+                    print(details)
         return self
 
 
@@ -576,7 +576,7 @@ def named(name):
         try:
             obj = __import__(toimport)
             break
-        except ImportError, err:
+        except ImportError as err:
             # print 'Import error on %s: %s' % (toimport, err)  # debugging spam
             import_err_strings.append(err.__str__())
             toimport = '.'.join(toimport.split('.')[:-1])
@@ -591,4 +591,3 @@ def named(name):
             raise AttributeError('attribute %r missing from %r (%r) %r.  Import errors: %r' % (
                 seg, obj, dirobj, name, import_err_strings))
     return obj
-
